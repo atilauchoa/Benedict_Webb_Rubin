@@ -1,5 +1,6 @@
 import math
 from tabulate import tabulate
+import matplotlib.pyplot as plt
 
 def print_parameter_table():
     """
@@ -75,7 +76,7 @@ def main():
     print("7 - Coeficiente (b)")
     print("8 - Fator ajustável (α)")
     print("9 - Coeficiente que modulação (c)")
-    print("20 - Coeficiente exponencial (γ)")
+    print("10 - Coeficiente exponencial (γ)")
     
     option = int(input("Digite a opção: "))
     
@@ -92,57 +93,38 @@ def main():
         c = float(input("Digite o valor de c: "))
         gamma = float(input("Digite o valor de γ: "))
         
+        # Calcula a pressão para a primeira temperatura
         P = bwr_pressure(rho, T, R, B0, A0, C0, b, a, alpha, c, gamma)
-        print(f"O valor de P em atm é: {P:.4f}")
+        print(f"\nO valor de P em atm para T = {T:.2f} K é: {P:.4f}")
         
-        convert = input("Deseja converter as unidades? (S/N): ").strip().upper()
-        if convert == 'S':
-            print("Selecione a unidade para conversão:")
-            print("1 - Pa (Pascal)")
-            print("2 - kPa (Kilopascal)")
-            print("3 - bar")
-            print("4 - psi (pounds per square inch)")
+        # Pergunta se o usuário deseja calcular para outras temperaturas
+        more_temps = input("Deseja calcular o valor de p para outras temperaturas? (S/N): ").strip().upper()
+        if more_temps == 'S':
+            num_temps = int(input("Quantas temperaturas deseja calcular? "))
+            temps = []
+            pressures = []
+            for _ in range(num_temps):
+                temp = float(input(f"Digite a temperatura {_+1} em Kelvin: "))
+                temps.append(temp)
+                # Calcula a pressão para cada temperatura fornecida
+                P = bwr_pressure(rho, temp, R, B0, A0, C0, b, a, alpha, c, gamma)
+                pressures.append(P)
             
-            unit = int(input("Digite a opção de conversão: "))
-            if unit == 1:
-                P_Pa = P * 101325  # 1 atm = 101325 Pa
-                print(f"O valor de P em Pa é: {P_Pa:.2f}")
-            elif unit == 2:
-                P_kPa = P * 101.325  # 1 atm = 101.325 kPa
-                print(f"O valor de P em kPa é: {P_kPa:.2f}")
-            elif unit == 3:
-                P_bar = P * 1.01325  # 1 atm = 1.01325 bar
-                print(f"O valor de P em bar é: {P_bar:.2f}")
-            elif unit == 4:
-                P_psi = P * 14.696  # 1 atm = 14.696 psi
-                print(f"O valor de P em psi é: {P_psi:.2f}")
-    elif option == 2:
-        # Implementar cálculo da densidade molar
-        pass
-    elif option == 3:
-        # Implementar cálculo do coeficiente A0
-        pass
-    elif option == 4:
-        # Implementar cálculo do coeficiente B0
-        pass
-    elif option == 5:
-        # Implementar cálculo do coeficiente C0
-        pass
-    elif option == 6:
-        # Implementar cálculo do coeficiente a
-        pass
-    elif option == 7:
-        # Implementar cálculo do coeficiente b
-        pass
-    elif option == 8:
-        # Implementar cálculo do coeficiente α
-        pass
-    elif option == 9:
-        # Implementar cálculo do coeficiente c
-        pass
-    elif option == 20:
-        # Implementar cálculo do coeficiente γ
-        pass
+            # Exibir os resultados em formato de tabela
+            print("\nResultados para as temperaturas fornecidas:")
+            results = list(zip(temps, pressures))
+            headers = ["Temperatura (K)", "Pressão (atm)"]
+            print(tabulate(results, headers=headers, tablefmt="grid", floatfmt=".4f"))
+            
+            # Plotar o gráfico
+            plt.figure(figsize=(10, 6))
+            plt.plot(temps, pressures, marker='o', linestyle='-', color='b')
+            plt.title('Relação entre Pressão e Temperatura')
+            plt.xlabel('Temperatura (K)')
+            plt.ylabel('Pressão (atm)')
+            plt.grid(True)
+            plt.show()
+        
     else:
         print("Opção inválida.")
 
