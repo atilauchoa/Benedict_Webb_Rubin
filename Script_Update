@@ -1,0 +1,146 @@
+import math
+from tabulate import tabulate
+
+def print_parameter_table():
+    """
+    Print a table with BWR parameters for various gases.
+    """
+    # Título da tabela em negrito
+    print("\033[1mTable with BWR parameters for various gases\033[0m")
+
+    # Definindo os dados da tabela
+    data = [
+        ["Metano (CH₄)", 2.2572, 0.6461, 0.00819, 3.62, 0.09907, 0.0838, 0.1371, 0.00535, 0.0437],
+        ["Etileno (C₂H₄)", 4.3767, 0.7857, 0.01403, 5.309, 0.0850, 0.101, 0.1947, 0.00654, 0.0272],
+        ["Propano (C₃H₈)", 4.7556, 1.1730, 0.02183, 6.56, 0.1120, 0.144, 0.2478, 0.00736, 0.0265],
+        ["Amônia (NH₃)", 1.9531, 0.7372, 0.00547, 2.71, 0.0652, 0.0525, 0.1084, 0.00354, 0.0673],
+        ["Dióxido de Carbono (CO₂)", 3.5928, 0.6707, 0.01294, 4.42, 0.0830, 0.097, 0.1788, 0.00567, 0.0455],
+        ["Hidrogênio (H₂)", 1.1292, 0.0393, 0.00068, 1.71, 0.0347, 0.0354, 0.0307, 0.00024, 0.0899],
+        ["Cloro (Cl₂)", 6.6791, 1.7110, 0.04868, 8.34, 0.0740, 0.165, 0.2446, 0.01356, 0.0285],
+        ["Dióxido de Enxofre (SO₂)", 5.0630, 0.7296, 0.03175, 6.63, 0.0850, 0.0690, 0.0987, 0.00232, 0.0757],
+        ["Nitreto de Carbono (N₂)", 2.0790, 0.4280, 0.00428, 3.51, 0.0655, 0.0215, 0.0380, 0.00098, 0.0392],
+        ["Acetileno (C₂H₂)", 3.2721, 0.6347, 0.01374, 4.37, 0.0841, 0.0883, 0.1400, 0.00435, 0.0182]
+    ]
+
+    # Cabeçalhos da tabela
+    headers = ["Gás", "A0 (atm·L²/mol²)", "B0 (L/mol)", "C0 (L³/mol²)", "a (atm·L²/mol²)", "b (L/mol)", "α (atm·L⁶/mol⁶)", "c (atm·L³/mol³)", "γ (L²/mol²)", "Densidade Molar (mol/L)"]
+
+    # Imprimindo a tabela
+    print(tabulate(data, headers=headers, tablefmt="grid", floatfmt=".4f"))
+
+def bwr_pressure(rho, T, R, B0, A0, C0, b, a, alpha, c, gamma):
+    """
+    Calculate pressure using the Benedict-Webb-Rubin (BWR) equation.
+    
+    Parameters:
+    rho (float): Molar density (mol/L)
+    T (float): Temperature (K)
+    R (float): Universal gas constant (L·atm/(K·mol))
+    B0 (float): BWR constant B0
+    A0 (float): BWR constant A0
+    C0 (float): BWR constant C0
+    b (float): BWR constant b
+    a (float): BWR constant a
+    alpha (float): BWR constant alpha
+    c (float): BWR constant c
+    gamma (float): BWR constant gamma
+    
+    Returns:
+    float: Pressure in atmospheres (atm)
+    """
+    term1 = rho * R * T
+    term2 = (B0 * R * T - A0 - C0 / T**2) * rho**2
+    term3 = (b * R * T - a) * rho**3
+    term4 = alpha * a * rho**6
+    term5 = (c * rho**3 / T**2) * (1 + gamma * rho**2) * math.exp(gamma * rho**2)
+    
+    pressure = term1 + term2 + term3 + term4 + term5
+    return pressure
+
+def main():
+    # Print the parameter table at the start
+    print_parameter_table()
+    
+    print("\nEscolha a variável de interesse para calcular usando a equação de BWR:")
+    print("1 - Calcular pressão (p)")
+    print("2 - Densidade molar (𝜌)")
+    print("3 - Coeficiente atração intermolecular (A0)")
+    print("4 - Coeficiente de segunda ordem (B0)")
+    print("5 - Coeficiente de interações de longo alcance (C0)")
+    print("6 - Coeficiente (a)")
+    print("7 - Coeficiente (b)")
+    print("8 - Fator ajustável (α)")
+    print("9 - Coeficiente que modulação (c)")
+    print("20 - Coeficiente exponencial (γ)")
+    
+    option = int(input("Digite a opção: "))
+    
+    if option == 1:
+        rho = float(input("Digite a densidade molar (ρ) em mol/L: "))
+        T = float(input("Digite o valor da temperatura (T) em Kelvin: "))
+        R = 0.0821  # Constante universal dos gases em L·atm/(K·mol)
+        A0 = float(input("Digite o valor de A0: "))
+        B0 = float(input("Digite o valor de B0: "))
+        C0 = float(input("Digite o valor de C0: "))
+        b = float(input("Digite o valor de b: "))
+        a = float(input("Digite o valor de a: "))
+        alpha = float(input("Digite o valor de α: "))
+        c = float(input("Digite o valor de c: "))
+        gamma = float(input("Digite o valor de γ: "))
+        
+        P = bwr_pressure(rho, T, R, B0, A0, C0, b, a, alpha, c, gamma)
+        print(f"O valor de P em atm é: {P:.4f}")
+        
+        convert = input("Deseja converter as unidades? (S/N): ").strip().upper()
+        if convert == 'S':
+            print("Selecione a unidade para conversão:")
+            print("1 - Pa (Pascal)")
+            print("2 - kPa (Kilopascal)")
+            print("3 - bar")
+            print("4 - psi (pounds per square inch)")
+            
+            unit = int(input("Digite a opção de conversão: "))
+            if unit == 1:
+                P_Pa = P * 101325  # 1 atm = 101325 Pa
+                print(f"O valor de P em Pa é: {P_Pa:.2f}")
+            elif unit == 2:
+                P_kPa = P * 101.325  # 1 atm = 101.325 kPa
+                print(f"O valor de P em kPa é: {P_kPa:.2f}")
+            elif unit == 3:
+                P_bar = P * 1.01325  # 1 atm = 1.01325 bar
+                print(f"O valor de P em bar é: {P_bar:.2f}")
+            elif unit == 4:
+                P_psi = P * 14.696  # 1 atm = 14.696 psi
+                print(f"O valor de P em psi é: {P_psi:.2f}")
+    elif option == 2:
+        # Implementar cálculo da densidade molar
+        pass
+    elif option == 3:
+        # Implementar cálculo do coeficiente A0
+        pass
+    elif option == 4:
+        # Implementar cálculo do coeficiente B0
+        pass
+    elif option == 5:
+        # Implementar cálculo do coeficiente C0
+        pass
+    elif option == 6:
+        # Implementar cálculo do coeficiente a
+        pass
+    elif option == 7:
+        # Implementar cálculo do coeficiente b
+        pass
+    elif option == 8:
+        # Implementar cálculo do coeficiente α
+        pass
+    elif option == 9:
+        # Implementar cálculo do coeficiente c
+        pass
+    elif option == 20:
+        # Implementar cálculo do coeficiente γ
+        pass
+    else:
+        print("Opção inválida.")
+
+if __name__ == "__main__":
+    main()
