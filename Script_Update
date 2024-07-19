@@ -58,8 +58,12 @@ def bwr_pressure(rho, T, R, B0, A0, C0, b, a, alpha, c, gamma):
     return pressure
 
 def main():
-    # Print the parameter table at the start
-    print_parameter_table()
+    # Perguntar ao usuário se deseja consultar a tabela de valores
+    consult_table = input("Deseja consultar a tabela de valores empíricos para gases? (S/N): ").strip().upper()
+    
+    if consult_table == 'S':
+        # Imprimir a tabela de parâmetros
+        print_parameter_table()
     
     print("\nEscolha a variável de interesse para calcular usando a equação de BWR:")
     print("1 - Calcular pressão (p)")
